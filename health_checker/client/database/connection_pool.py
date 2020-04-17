@@ -1,8 +1,8 @@
 # -*- coding:UTF-8 -*-
 import logging
-import Queue
+import queue
 
-import MySQLdb
+import pymysql
 
 
 __author__ = 'hzlaimingxing'
@@ -16,13 +16,13 @@ class ConnectionPool(object):
 
         self.size = kwargs.get('size', 10)
         self.kwargs = kwargs
-        self.conn_queue = Queue.Queue(maxsize=self.size)
+        self.conn_queue = queue.Queue(maxsize=self.size)
 
         for i in range(self.size):
             self.conn_queue.put(self._create_new_conn())
 
     def _create_new_conn(self):
-        return MySQLdb.connect(host=self.kwargs.get('host', '127.0.0.1'),
+        return pymysql.connect(host=self.kwargs.get('host', '127.0.0.1'),
                                user=self.kwargs.get('user'),
                                passwd=self.kwargs.get('password'),
                                port=self.kwargs.get('port', 3306),
@@ -43,10 +43,10 @@ class ConnectionPool(object):
             with conn as cur:
                 cur.execute(sql)
                 return cur.fetchall()
-        except MySQLdb.ProgrammingError as e:
+        except pymyql.ProgrammingError as e:
             LOG.error("execute sql ({0}) error {1}".format(sql, e))
             raise e
-        except MySQLdb.OperationalError as e:
+        except pymysql.OperationalError as e:
             # create connection if connection has interrupted
             conn = self._create_new_conn()
             raise e
@@ -59,5 +59,5 @@ class ConnectionPool(object):
                 conn = self.conn_queue.get_nowait()
                 if conn:
                     conn.close()
-        except Queue.Empty:
+        except queue.Empty:
             pass

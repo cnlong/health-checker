@@ -57,7 +57,7 @@ def main():
         server.do_health_check()
         server.get_summary()
 
-    except Exception, exc:
+    except Exception as exc:
         print(exc)
         LOG.error(traceback.format_exc())
 

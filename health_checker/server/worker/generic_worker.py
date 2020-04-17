@@ -27,7 +27,7 @@ class GenericWorker(object):
         try:
             self.print_start_info()
             self.execute()
-        except Exception, e:
+        except Exception as e:
             LOG.info('failed to health check: {0}, failed reason : {1}'.format(self.name, e))
         else:
             self.print_end_info()
